@@ -3,9 +3,62 @@
     Layout = "_CartLayout";
 }
 
-<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 70vh;">
-    <h2 class="mt-4">Thanks</h2>
-    <p>Thanks for placing order #@Model.OrderID</p>
-    <p>We'll ship your goods as soon as possible.</p>
-    <a class="btn btn-primary mt-3" href="/">Return to Store</a>
+<div class="d-flex flex-column align-items-center justify-content-center bg-white p-5 rounded-3 shadow" style="min-height: 60vh; margin: 20px auto; max-width: 600px;">
+    <div class="text-center mb-4">
+        <i class="fas fa-check-circle text-success" style="font-size: 64px;"></i>
+    </div>
+
+    <h2 class="mb-4 fw-bold" style="color: var(--secondary-color);">Thank You!</h2>
+
+    <div class="mb-4 text-center">
+        <p class="mb-2 fs-5">Thanks for placing order #@Model.OrderID</p>
+        <p class="text-muted">We'll ship your goods as soon as possible.</p>
+    </div>
+
+    <div class="mt-3 d-flex flex-column gap-3 w-75">
+        <a href="/" class="btn add-to-cart-btn w-100 d-flex align-items-center justify-content-center gap-2">
+            <i class="fas fa-home"></i> Return to Store
+        </a>
+
+        
+    </div>
 </div>
+
+<style>
+    .add-to-cart-btn {
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: var(--radius);
+        padding: 12px 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 14px;
+    }
+
+        .add-to-cart-btn:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+    .category-item {
+        display: block;
+        padding: 12px;
+        color: var(--secondary-color);
+        text-decoration: none;
+        border-radius: var(--radius);
+        text-align: center;
+        border: 1px solid var(--medium-gray);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .category-item:hover {
+            background-color: var(--light-gray);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+</style>

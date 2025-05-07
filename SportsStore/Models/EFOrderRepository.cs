@@ -1,6 +1,4 @@
-﻿// Models/EFOrderRepository.cs
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace SportsStore.Models
@@ -20,66 +18,39 @@ namespace SportsStore.Models
 
         public int SaveOrder(Order order)
         {
-            // Ensure context tracking is working correctly
             context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
 
             if (order.OrderID == 0)
             {
-                try
+                foreach (var line in order.Lines)
                 {
-                    // For new orders, we need to handle the products carefully
-                    foreach (var line in order.Lines)
+                    if (line.Product != null)
                     {
-                        // Make sure the product is attached but not tracked for changes
-                        if (line.Product != null)
+                        if (line.Product.ProductId.HasValue)
                         {
-                            // Set the ProductId from the Product object
-                            if (line.Product.ProductId.HasValue)
-                            {
-                                line.ProductId = line.Product.ProductId.Value;
-                            }
+                            line.ProductId = line.Product.ProductId.Value;
+                        }
 
-                            // Check if the product is already being tracked
-                            var trackedProduct = context.Products.Local.FirstOrDefault(p =>
-                                p.ProductId.HasValue && p.ProductId == line.Product.ProductId);
+                        var trackedProduct = context.Products.Local.FirstOrDefault(p =>
+                            p.ProductId.HasValue && p.ProductId == line.Product.ProductId);
 
-                            if (trackedProduct == null)
-                            {
-                                // If not tracked, attach it
-                                context.Products.Attach(line.Product);
-                            }
-                            else
-                            {
-                                // If already tracked, use the tracked entity
-                                line.Product = trackedProduct;
-                            }
+                        if (trackedProduct == null)
+                        {
+                            context.Products.Attach(line.Product);
+                        }
+                        else
+                        {
+                            line.Product = trackedProduct;
                         }
                     }
-
-                    // Add the order to the context
-                    context.Orders.Add(order);
-
-                    // Save changes to the database
-                    context.SaveChanges();
-                    return order.OrderID;
                 }
-                catch (Exception ex)
-                {
-                    // You might want to log this exception
-                    Console.WriteLine($"Error saving order: {ex.Message}");
 
-                    // If there's an inner exception, log that too
-                    if (ex.InnerException != null)
-                    {
-                        Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-                    }
-
-                    throw; // Re-throw to handle in the controller
-                }
+                context.Orders.Add(order);
+                context.SaveChanges();
+                return order.OrderID;
             }
             else
             {
-                // For existing orders, update them
                 var dbOrder = context.Orders
                     .Include(o => o.Lines)
                     .ThenInclude(l => l.Product)
@@ -87,24 +58,19 @@ namespace SportsStore.Models
 
                 if (dbOrder != null)
                 {
-                    // Update order properties
                     context.Entry(dbOrder).CurrentValues.SetValues(order);
 
-                    // Update or add lines
                     foreach (var line in order.Lines)
                     {
                         var dbLine = dbOrder.Lines.FirstOrDefault(l => l.CartLineID == line.CartLineID);
                         if (dbLine != null)
                         {
-                            // Update existing line
                             context.Entry(dbLine).CurrentValues.SetValues(line);
 
-                            // Make sure the product reference is correct
                             if (line.Product != null && line.Product.ProductId.HasValue)
                             {
                                 dbLine.ProductId = line.Product.ProductId.Value;
 
-                                // Update the product reference if needed
                                 if (dbLine.Product.ProductId != line.Product.ProductId)
                                 {
                                     var product = context.Products.Find(line.Product.ProductId);
@@ -117,13 +83,10 @@ namespace SportsStore.Models
                         }
                         else
                         {
-                            // Add new line
-                            // Make sure ProductId is set correctly
                             if (line.Product != null && line.Product.ProductId.HasValue)
                             {
                                 line.ProductId = line.Product.ProductId.Value;
 
-                                // Attach the product if needed
                                 var product = context.Products.Find(line.ProductId);
                                 if (product != null)
                                 {
@@ -135,12 +98,10 @@ namespace SportsStore.Models
                                 }
                             }
 
-                            // Add the line to the order
                             dbOrder.Lines.Add(line);
                         }
                     }
 
-                    // Remove lines not in the updated order
                     foreach (var dbLine in dbOrder.Lines.ToList())
                     {
                         if (!order.Lines.Any(l => l.CartLineID == dbLine.CartLineID))
@@ -150,7 +111,6 @@ namespace SportsStore.Models
                     }
                 }
 
-                // Save all changes
                 context.SaveChanges();
                 return order.OrderID;
             }

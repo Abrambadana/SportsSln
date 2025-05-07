@@ -1,37 +1,189 @@
-﻿@model ProductsListViewModel
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Listing</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --radius: 8px;
+        }
 
-<div class="products">
-    @foreach (var p in Model.Products ?? Enumerable.Empty<Product>())
-    {
-        <div class="product-item">
-            <div class="row">
-                <div class="col-8">
-                    <h4>@p.Name</h4>
-                    <p>@p.Description</p>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .products {
+            margin-bottom: 40px;
+        }
+
+        .product-item {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+            .product-item:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            }
+
+            .product-item .row {
+                display: flex;
+                flex-wrap: wrap;
+                padding: 20px;
+            }
+
+            .product-item .col-8 {
+                flex: 0 0 66.666667%;
+                max-width: 66.666667%;
+                padding-right: 15px;
+            }
+
+            .product-item .col-4 {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: flex-end;
+            }
+
+            .product-item h4 {
+                color: var(--secondary-color);
+                margin-top: 0;
+                margin-bottom: 12px;
+                font-size: 22px;
+                font-weight: 600;
+            }
+
+            .product-item p {
+                color: var(--dark-gray);
+                margin-bottom: 0;
+                font-size: 16px;
+                line-height: 1.5;
+            }
+
+        .price-badge {
+            background-color: var(--light-gray);
+            color: var(--secondary-color);
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 14px;
+        }
+
+            .add-to-cart-btn:hover {
+                background-color: #2980b9;
+            }
+
+        .text-end {
+            text-align: right;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+            .pagination a {
+                display: inline-block;
+                padding: 8px 16px;
+                margin: 0 5px;
+                background-color: white;
+                color: var(--primary-color);
+                text-decoration: none;
+                border-radius: var(--radius);
+                font-weight: 500;
+                box-shadow: var(--shadow);
+                transition: all 0.3s ease;
+            }
+
+                .pagination a:hover {
+                    background-color: var(--medium-gray);
+                }
+
+                .pagination a.active {
+                    background-color: var(--primary-color);
+                    color: white;
+                }
+
+        /* Removed media queries as requested */
+    </style>
+</head>
+<body>
+    <div class="container">
+        @model ProductsListViewModel
+        <div class="products">
+            @foreach (var p in Model.Products ?? Enumerable.Empty<Product>())
+            {
+                <div class="product-item">
+                    <div class="row">
+                        <div class="col-8">
+                            <h4>@p.Name</h4>
+                            <p>@p.Description</p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="price-badge">₱@p.Price.ToString("F2")</div>
+                            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                <input type="hidden" name="productId" value="@p.ProductId" />
+                                <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-4 text-end">
-                    <div class="price-badge">Product Price: ₱@p.Price.ToString("F2")</div>
-                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                        <input type="hidden" name="productId" value="@p.ProductId" />
-                        <!-- Remove the returnUrl since we're always going to Cart/Cart -->
-                        <button type="submit" class="add-to-cart-btn">Add to Cart</button>
-                    </form>
-                </div>
-            </div>
+            }
         </div>
-    }
-</div>
-
-<div class="pagination">
-    @for (int i = 1; i <= Model.PagingInfo.TotalPages; i++)
-    {
-        @if (Model.CurrentCategory == null)
-        {
-            <a href="/Page@(i)" class="@(i == Model.PagingInfo.CurrentPage ? "active" : "")">@i</a>
-        }
-        else
-        {
-            <a href="/@Model.CurrentCategory/Page@(i)" class="@(i == Model.PagingInfo.CurrentPage ? "active" : "")">@i</a>
-        }
-    }
-</div>
+        <div class="pagination">
+            @for (int i = 1; i <= Model.PagingInfo.TotalPages; i++)
+            {
+                @if (Model.CurrentCategory == null)
+                {
+                    <a href="/Page@(i)" class="@(i == Model.PagingInfo.CurrentPage ? "active" : "")">@i</a>
+                }
+                else
+                {
+                    <a href="/@Model.CurrentCategory/Page@(i)" class="@(i == Model.PagingInfo.CurrentPage ? "active" : "")">@i</a>
+                }
+            }
+        </div>
+    </div>
+</body>
+</html>

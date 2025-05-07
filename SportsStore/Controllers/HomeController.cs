@@ -2,8 +2,6 @@
 using SportsStore.Models;
 using SportsStore.Models.ViewModels;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization; // Add this for ReferenceHandler
 
 namespace SportsStore.Controllers
 {
@@ -34,9 +32,9 @@ namespace SportsStore.Controllers
                 {
                     CurrentPage = productPage,
                     ItemsPerPage = PageSize,
-                    TotalItems = category == null ?
-                        storeRepository.Products.Count() :
-                        storeRepository.Products.Where(e => e.Category == category).Count()
+                    TotalItems = category == null
+                        ? storeRepository.Products.Count()
+                        : storeRepository.Products.Where(e => e.Category == category).Count()
                 },
                 CurrentCategory = category
             });
@@ -44,26 +42,24 @@ namespace SportsStore.Controllers
 
         public IActionResult Checkout()
         {
-            // Check if cart is empty
-            if (cart.Lines.Count() == 0)
+            if (!cart.Lines.Any())
             {
-                ModelState.AddModelError("", "Sorry, your cart is empty!");
+                ModelState.AddModelError("", "Your cart is empty!");
                 return RedirectToAction("Cart", "Cart");
             }
+
             return View(new Order());
         }
 
         [HttpPost]
         public IActionResult Checkout(Order order)
         {
-            if (cart.Lines.Count == 0)
+            if (!cart.Lines.Any())
             {
                 ModelState.AddModelError("", "Your cart is empty!");
                 return View(order);
             }
 
-            // Populate the order's Lines collection from the cart
-            // IMPORTANT: Do this BEFORE checking ModelState.IsValid
             order.Lines = cart.Lines.Select(line => new CartLine
             {
                 ProductId = line.Product.ProductId ?? 0,
@@ -73,35 +69,17 @@ namespace SportsStore.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    // Save the order
-                    int orderId = orderRepository.SaveOrder(order);
-
-                    // Clear the cart
-                    cart.Clear();
-
-                    // Instead of serializing the entire order, just store the order ID
-                    TempData["OrderId"] = orderId;
-
-                    // Redirect to the Completed action in CartController
-                    return RedirectToAction("Completed", "Cart");
-                }
-                catch (Exception ex)
-                {
-                    // Log the exception
-                    ModelState.AddModelError("", "Error saving order: " + ex.Message);
-                }
+                int orderId = orderRepository.SaveOrder(order);
+                cart.Clear();
+                TempData["OrderId"] = orderId;
+                return RedirectToAction("Completed", "Cart");
             }
 
-            // If we got here, something went wrong
             return View(order);
         }
 
-        // Add a Completed action as fallback
         public IActionResult Completed()
         {
-            // Redirect to Cart controller's Completed action
             return RedirectToAction("Completed", "Cart");
         }
     }

@@ -25,20 +25,17 @@ namespace SportsStore.Controllers
 
         public IActionResult Completed()
         {
-            // Get the order ID from TempData
             if (TempData["OrderId"] is int orderId)
             {
-                // Retrieve the order from the database
                 var order = orderRepository.Orders
                     .FirstOrDefault(o => o.OrderID == orderId);
 
                 if (order != null)
                 {
-                    return View(order);  // Pass the order to the view
+                    return View(order);
                 }
             }
 
-            // Redirect back to the Cart page if the order wasn't found
             return RedirectToAction("Cart", "Cart");
         }
 
@@ -51,7 +48,7 @@ namespace SportsStore.Controllers
             {
                 cart.AddItem(product, 1);
             }
-            return RedirectToAction("Cart", "Cart");
+            return RedirectToAction("Cart", new { returnUrl });
         }
 
         [HttpPost]
