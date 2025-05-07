@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Debug Information";
+}
+
+<h2>Debug Information</h2>
+
+<h3>Route Information</h3>
+<p><strong>Controller:</strong> @ViewContext.RouteData.Values["controller"]</p>
+<p><strong>Action:</strong> @ViewContext.RouteData.Values["action"]</p>
+
+<h3>View Information</h3>
+<p><strong>View Name:</strong> @ViewContext.View.Path</p>
+
+<h3>ViewBag Information</h3>
+@foreach (var item in ViewBag.GetType().GetProperties())
+{
+    <p><strong>@item.Name:</strong> @item.GetValue(ViewBag)</p>
+}
+
+<h3>Current URL</h3>
+<p>@Context.Request.Path@Context.Request.QueryString</p>
+
+<h3>Session Information</h3>
+<ul>
+    @foreach (var key in Context.Session.Keys)
+    {
+        <li>@key</li>
+    }
+</ul>
+
+<a href="/">Return Home</a>

@@ -1,0 +1,56 @@
+﻿@model CartIndexViewModel
+@{
+    Layout = "_CartLayout";
+}
+<h2>Your Shopping Cart</h2>
+
+@if (Model.Cart.Lines.Count() > 0)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Model.Cart.Lines)
+            {
+                <tr>
+                    <td class="text-center">@line.Quantity</td>
+                    <td class="text-start">@line.Product.Name</td>
+                    <td class="text-end">₱@line.Product.Price.ToString("F2")</td>
+                    <td class="text-end">₱@((line.Quantity * line.Product.Price).ToString("F2"))</td>
+                    <td class="text-center">
+                        <form asp-action="RemoveFromCart" method="post">
+                            <input type="hidden" name="productId" value="@line.Product.ProductId" />
+                            <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end">Total:</td>
+                <td class="text-end">₱@Model.Cart.ComputeTotalValue().ToString("F2")</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="text-center">
+        <a class="btn btn-primary" href="/">Continue Shopping</a>
+        <a class="btn btn-success" asp-controller="Home" asp-action="Checkout">Checkout</a>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Your cart is empty! <a href="/">Continue shopping</a>
+    </div>
+}

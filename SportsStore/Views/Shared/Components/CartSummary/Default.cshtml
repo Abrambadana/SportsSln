@@ -1,0 +1,11 @@
+﻿@model Cart
+
+<div class="cart-icon-container">
+    <a class="cart-icon" asp-controller="Cart" asp-action="Index">
+        🛒
+        @if (Model.Lines.Count() > 0)
+        {
+            <span class="badge bg-danger">@Model.Lines.Sum(x => x.Quantity)</span>
+        }
+    </a>
+</div>
