@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportsStore.Models;
 
@@ -10,9 +11,11 @@ using SportsStore.Models;
 namespace SportsStore.Migrations
 {
     [DbContext(typeof(StoreDBContext))]
-    partial class StoreDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250507074236_UpdatedRelationship")]
+    partial class UpdatedRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +47,7 @@ namespace SportsStore.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartLines");
+                    b.ToTable("CartLine");
                 });
 
             modelBuilder.Entity("SportsStore.Models.Order", b =>
@@ -128,7 +131,7 @@ namespace SportsStore.Migrations
 
             modelBuilder.Entity("SportsStore.Models.CartLine", b =>
                 {
-                    b.HasOne("SportsStore.Models.Order", "Order")
+                    b.HasOne("SportsStore.Models.Order", null)
                         .WithMany("Lines")
                         .HasForeignKey("OrderID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -139,8 +142,6 @@ namespace SportsStore.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });

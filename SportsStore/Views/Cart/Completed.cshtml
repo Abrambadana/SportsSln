@@ -1,0 +1,11 @@
+﻿@model SportsStore.Models.Order
+@{
+    Layout = "_CartLayout";
+}
+
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 70vh;">
+    <h2 class="mt-4">Thanks</h2>
+    <p>Thanks for placing order #@Model.OrderID</p>
+    <p>We'll ship your goods as soon as possible.</p>
+    <a class="btn btn-primary mt-3" href="/">Return to Store</a>
+</div>

@@ -15,7 +15,9 @@ builder.Services.AddDbContext<StoreDBContext>(opts =>
 });
 
 // Add repository service
+
 builder.Services.AddScoped<IStoreRepository, EFStoreRepository>();
+builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
 
 // Configure session services
 builder.Services.AddDistributedMemoryCache();

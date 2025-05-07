@@ -10,7 +10,7 @@ namespace SportsStore.Models
         public int OrderID { get; set; }
 
         [BindNever]
-        public ICollection<CartLine> Lines { get; set; }
+        public ICollection<CartLine> Lines { get; set; } = new List<CartLine>(); // Initialize with empty collection
 
         [Required(ErrorMessage = "Please enter a name")]
         public string Name { get; set; }
@@ -35,5 +35,8 @@ namespace SportsStore.Models
 
         [BindNever]
         public bool Shipped { get; set; }
+
+        // Combine address parts into one field (for display purposes in view)
+        public string FullAddress => $"{Line1} {Line2} {Line3}, {City}, {State}, {Zip}, {Country}";
     }
 }
